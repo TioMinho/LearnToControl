@@ -1,0 +1,12 @@
+# Latex Temporary Files #
+#########################
+Presentation/*
+!Presentation/*.pdf
+!Presentation/imgs/*
+
+# Mac OS strange folders #
+##########################
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
