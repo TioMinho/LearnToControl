@@ -1,6 +1,10 @@
+
+import os
+from math import sin, cos, pi
 import tensorflow as tf
 import numpy as np
 import gym
+import matplotlib.pyplot as plt
 
 env = gym.make('CartPole-v0')
 env = env.unwrapped
@@ -126,7 +130,7 @@ with tf.name_scope("inputs"):
 		train_opt = tf.train.AdamOptimizer(learning_rate).minimize(loss)
 
 # Setup TensorBoard Writer
-writer = tf.summary.FileWriter("/tensorboard/pg/1")
+writer = tf.summary.FileWriter("tensorboard/pg/1")
 
 ## Losses
 tf.summary.scalar("Loss", loss)
@@ -145,19 +149,20 @@ episode_states, episode_actions, episode_rewards = [],[],[]
 with tf.Session() as sess:
 	sess.run(tf.global_variables_initializer())
 
-	for episode in range(max_episodes):
+	for episode in range(max_episodes+1):
 
 		episode_rewards_sum = 0
 
 		# Launch the game
 		state = env.reset()
 
-		env.render()
+		# env.render()
 
-		firstDone = false;
+		episode_states, episode_actions, episode_rewards = [],[],[]
+		firstDone = False;
 		x_out = np.zeros([4, 1000]); t_span = np.arange(0, 10, 0.01);
         # for _ in range(1000):
-        while(true):
+		for i in range(0, 1000):
 			# Choose action a, remember WE'RE NOT IN A DETERMINISTIC ENVIRONMENT, WE'RE OUTPUT PROBABILITIES.
 			action_probability_distribution = sess.run(action_distribution, feed_dict={input_: state.reshape([1,4])})
 
@@ -180,7 +185,7 @@ with tf.Session() as sess:
 
 			episode_rewards.append(reward)
 			if done and not firstDone:
-				firstDone = true
+				firstDone = True
 				# Calculate sum reward
 				episode_rewards_sum = np.sum(episode_rewards)
 
@@ -225,11 +230,10 @@ with tf.Session() as sess:
 				# Reset the transition stores
 				episode_states, episode_actions, episode_rewards = [],[],[]
 
-				break
+				# break
 
 			state = new_state
 
 		data = np.vstack([t_span, x_out]); data = data.T
-		print(data)
-        # if(e % 100 == 0):
-        #     drawCart(data,e)
+		if(episode % 100 == 0):
+			drawCart(data,episode)
